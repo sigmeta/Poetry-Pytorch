@@ -52,7 +52,7 @@ class Trainer_LSTM(object):
         model=torch.load('output/model-lstm.pkl')
         model.eval()
         model=model.cuda()
-        tgt_list=[1]+self.convert.text_to_arr(self.tgt_text)
+        tgt_list=[1]+self.convert.text_to_arr(self.config.tgt_text)
         for i in range(self.config.tgt_max_len):
             tgt=torch.tensor(tgt_list)
             tgt=tgt.cuda().unsqueeze(0)
@@ -74,7 +74,6 @@ class Trainer_TransformerLM(object):
     def train(self):
         tgt_mask=torch.triu(torch.ones(self.config.tgt_max_len,self.config.tgt_max_len),1)
         tgt_mask=tgt_mask.masked_fill(tgt_mask.byte(),value=torch.tensor(float('-inf')))
-        print(tgt_mask)
         model=TransformerLM(d_model=self.config.hidden_dims, nhead=self.config.num_heads, 
                             num_layers=self.config.num_layers,  dim_feedforward=4*self.config.hidden_dims,
                             dropout=self.config.dropout,vocab_size=self.convert.vocab_size)
@@ -138,7 +137,6 @@ class Trainer_Transformer(object):
     def train(self):
         tgt_mask=torch.triu(torch.ones(self.config.tgt_max_len,self.config.tgt_max_len),1)
         tgt_mask=tgt_mask.masked_fill(tgt_mask.byte(),value=torch.tensor(float('-inf')))
-        print(tgt_mask)
         model=PTransformer(d_model=self.config.hidden_dims, nhead=self.config.num_heads, 
                             num_encoder_layers=self.config.num_encoder_layers, num_decoder_layers=self.config.num_decoder_layers, 
                             dim_feedforward=4*self.config.hidden_dims, dropout=self.config.dropout,vocab_size=self.convert.vocab_size)

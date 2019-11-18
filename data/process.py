@@ -24,6 +24,7 @@ class TextConverter(object):
         vocab_count_list = []
         for word in vocab_count:
             vocab_count_list.append((word, vocab_count[word]))
+        vocab_count_list.sort(key=lambda x: x[0])
         vocab_count_list.sort(key=lambda x: x[1], reverse=True)
         if len(vocab_count_list) > max_vocab:
             vocab_count_list = vocab_count_list[:max_vocab-3]
