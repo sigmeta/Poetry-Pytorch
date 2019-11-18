@@ -4,7 +4,7 @@ from torch.utils.data import TensorDataset
 import copy
 
 class TextConverter(object):
-    def __init__(self, text_path, max_vocab=5000, min_freq=2, src_max_len=16, tgt_max_len=64):
+    def __init__(self, text_path, max_vocab=5000, min_freq=2):
         """Construct a text index converter.
         Args:
             text_path: txt file path.
@@ -32,8 +32,6 @@ class TextConverter(object):
 
         self.word_to_int_table = {c: i for i, c in enumerate(self.vocab)}
         self.int_to_word_table = dict(enumerate(self.vocab))
-        self.src_max_len=src_max_len
-        self.tgt_max_len=tgt_max_len
 
     @property
     def vocab_size(self):
@@ -64,6 +62,25 @@ class TextConverter(object):
         return "".join(words)
 
 
+def get_dataset_lm(text_path, arr_to_idx, tgt_max_len):
+    with open(text_path, 'r', encoding='utf8') as f:
+        text = f.read()
+    tgt_list=[]
+    label_list=[]
+    for t in text.strip().split('\n'):
+        tgt=arr_to_idx(t)[:tgt_max_len-1]
+        label=copy.copy(tgt)
+        tgt=[1]+tgt
+        label.append(1)
+        while len(tgt)<tgt_max_len:
+            tgt.append(0)
+            label.append(0)
+        tgt_list.append(tgt)
+        label_list.append(label)
+    tgt_tensor=torch.tensor(tgt_list)
+    label_tensor=torch.tensor(label_list)
+    return TensorDataset(tgt_tensor,label_tensor)
+
 def get_dataset(text_path, arr_to_idx, src_max_len, tgt_max_len):
     with open(text_path, 'r', encoding='utf8') as f:
         text = f.read()
@@ -72,11 +89,12 @@ def get_dataset(text_path, arr_to_idx, src_max_len, tgt_max_len):
     label_list=[]
     for t in text.strip().split('\n'):
         tlist=t.split(':')
-        if len(tlist)!=2:
-            print(t)
-            continue
-        src=arr_to_idx(tlist[0])[:src_max_len]
-        tgt=arr_to_idx(tlist[1])[:tgt_max_len-1]
+        if len(tlist)==1:
+            src=arr_to_idx([])[:src_max_len]
+            tgt=arr_to_idx(tlist[0])[:tgt_max_len-1]
+        elif len(tlist)>=2:
+            src=arr_to_idx(tlist[0])[:src_max_len]
+            tgt=arr_to_idx(tlist[1])[:tgt_max_len-1]
         label=copy.copy(tgt)
         tgt=[1]+tgt
         label.append(1)
