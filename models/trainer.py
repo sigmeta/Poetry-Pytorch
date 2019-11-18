@@ -46,10 +46,10 @@ class Trainer_LSTM(object):
                 updates+=1
                 #print(loss)
             print("training loss:",running_loss/updates)
-        torch.save(model.cpu(),"output/model-lstm.pkl")
+        torch.save(model.cpu(),self.config.output_path)
 
     def test(self):
-        model=torch.load('output/model-lstm.pkl')
+        model=torch.load(self.config.output_path)
         model.eval()
         model=model.cuda()
         tgt_list=[1]+self.convert.text_to_arr(self.config.tgt_text)
@@ -108,10 +108,10 @@ class Trainer_TransformerLM(object):
                 updates+=1
                 #print(loss)
             print("training loss:",running_loss/updates)
-        torch.save(model.cpu(),"output/model-transformerlm.pkl")
+        torch.save(model.cpu(),self.config.output_path)
 
     def test(self):
-        model=torch.load('output/model-transformerlm.pkl')
+        model=torch.load(self.config.output_path)
         model.eval()
         model=model.cuda()
         tgt_list=[1]+self.convert.text_to_arr(self.config.tgt_text)
@@ -175,10 +175,10 @@ class Trainer_Transformer(object):
                 updates+=1
                 #print(loss)
             print("training loss:",running_loss/updates)
-        torch.save(model.cpu(),"output/model-transformer.pkl")
+        torch.save(model.cpu(),self.config.output_path)
 
     def test(self):
-        model=torch.load('output/model-transformer.pkl')
+        model=torch.load(self.config.output_path)
         model.eval()
         model=model.cuda()
         src=torch.tensor(self.convert.text_to_arr(self.config.src_text))
